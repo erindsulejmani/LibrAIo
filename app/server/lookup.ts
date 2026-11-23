@@ -25,13 +25,7 @@ async function getJson(url: string): Promise<any> {
   }
 }
 
-export async function fromGoogleBooks(isbn: string): Promise<Partial<BookData> | null> {
-  const key = process.env.GOOGLE_BOOKS_API_KEY;
-  const json = await getJson(
-    `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}${key ? `&key=${key}` : ""}`,
-  );
-  const v = json?.items?.[0]?.volumeInfo;
-  if (!v) return null;
+function fromGoogleVolume(v: any): Partial<BookData> {
   return {
     title: [v.title, v.subtitle].filter(Boolean).join(". ") || null,
     authors: v.authors?.join("; ") ?? null,
@@ -44,6 +38,17 @@ export async function fromGoogleBooks(isbn: string): Promise<Partial<BookData> |
     cover_url: (v.imageLinks?.thumbnail ?? v.imageLinks?.smallThumbnail)?.replace(/^http:/, "https:") ?? null,
   };
 }
+
+async function googleBooks(query: string): Promise<Partial<BookData> | null> {
+  const key = process.env.GOOGLE_BOOKS_API_KEY;
+  const json = await getJson(
+    `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}${key ? `&key=${key}` : ""}`,
+  );
+  const v = json?.items?.[0]?.volumeInfo;
+  return v ? fromGoogleVolume(v) : null;
+}
+
+export const fromGoogleBooks = (isbn: string) => googleBooks(`isbn:${isbn}`);
 
 export async function fromOpenLibrary(isbn: string): Promise<Partial<BookData> | null> {
   const json = await getJson(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
@@ -82,6 +87,37 @@ export async function lookupIsbn(isbn: string): Promise<{ data: BookData; source
       description: description?.description ?? null,
       description_source: description?.description_source ?? null,
       cover_url: pick("cover_url"),
+    },
+  };
+}
+
+/**
+ * Cerca per titolo (e autore) quando non c'è ISBN. Il risultato può essere un'altra edizione:
+ * se ne usano solo riassunto, generi e copertina, che l'utente conferma nella scheda.
+ */
+export async function searchByTitle(
+  title: string,
+  author: string | null,
+): Promise<{ data: Partial<BookData>; sources: string[] }> {
+  const g = await googleBooks(`intitle:${title}${author ? ` inauthor:${author}` : ""}`);
+  let coverUrl = g?.cover_url ?? null;
+  const sources = g ? ["Google Books (ricerca per titolo)"] : [];
+  if (!coverUrl) {
+    const q = new URLSearchParams({ title, limit: "1", fields: "cover_i" });
+    if (author) q.set("author", author);
+    const coverId = (await getJson(`https://openlibrary.org/search.json?${q}`))?.docs?.[0]?.cover_i;
+    if (coverId) {
+      coverUrl = `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+      sources.push("Open Library (copertina)");
+    }
+  }
+  return {
+    sources,
+    data: {
+      genres: g?.genres ?? null,
+      description: g?.description ?? null,
+      description_source: g?.description_source ?? null,
+      cover_url: coverUrl,
     },
   };
 }

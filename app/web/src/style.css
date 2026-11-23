@@ -10,9 +10,11 @@ button:disabled { opacity: .5; }
 input, textarea { padding: 8px; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
 .field { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; }
 .scanner { width: 100%; max-height: 50vh; background: #000; border-radius: 8px; }
-.cover-preview { max-width: 160px; align-self: center; }
 .note { background: #eef3fa; padding: 8px; border-radius: 6px; }
 .error { background: #fbeaea; color: #8a1c1c; padding: 8px; border-radius: 6px; }
 .books { list-style: none; padding: 0; }
 .books li { display: flex; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid #eee; }
 .books img, .no-cover { width: 40px; height: 60px; object-fit: cover; background: #e6dfd6; flex-shrink: 0; }
+.covers { display: flex; gap: 16px; flex-wrap: wrap; border: 1px solid #ccc; border-radius: 6px; }
+.covers label { display: flex; align-items: center; gap: 6px; }
+.covers img { width: 80px; max-height: 120px; object-fit: contain; }
