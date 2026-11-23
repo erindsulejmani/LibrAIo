@@ -6,6 +6,8 @@ import { db, COVERS_DIR } from "./db.ts";
 import { normalizeIsbn } from "./isbn.ts";
 import { lookupIsbn, searchByTitle, type BookData } from "./lookup.ts";
 import { readBookPhoto } from "./gemini.ts";
+import { catalogWorkbook } from "./excel.ts";
+import { scheduleBackups } from "./backup.ts";
 
 const PORT = Number(process.env.PORT ?? 3000);
 const WEB_DIST = path.resolve(import.meta.dirname, "../web/dist");
@@ -19,6 +21,11 @@ app.get("/api/health", (_req, res) => {
 
 app.get("/api/books", (_req, res) => {
   res.json(db.prepare("SELECT * FROM books ORDER BY title COLLATE NOCASE").all());
+});
+
+app.get("/api/export.xlsx", async (_req, res) => {
+  const name = `LibrAIo-catalogo-${new Date().toISOString().slice(0, 10)}.xlsx`;
+  res.attachment(name).type("xlsx").send(await catalogWorkbook());
 });
 
 app.get("/api/lookup/isbn/:code", async (req, res) => {
@@ -148,4 +155,5 @@ app.listen(PORT, "0.0.0.0", () => {
     }
   }
   console.log(`\nPer chiudere: Ctrl+C oppure chiudi questa finestra.\n`);
+  scheduleBackups();
 });

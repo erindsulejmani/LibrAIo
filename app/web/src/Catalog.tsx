@@ -63,6 +63,7 @@ export function Catalog({ books, onChanged }: { books: Book[]; onChanged: () => 
         <button className="secondary" onClick={() => setLayout(layout === "griglia" ? "tabella" : "griglia")}>
           {layout === "griglia" ? "Vista tabella" : "Vista griglia"}
         </button>
+        <a className="button secondary" href="/api/export.xlsx" download>Esporta Excel</a>
       </div>
       <p className="muted">{shown.length} di {books.length} libri</p>
 
