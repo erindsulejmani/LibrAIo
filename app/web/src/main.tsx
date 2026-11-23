@@ -1,9 +1,8 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AddBook } from "./AddBook.tsx";
+import { Catalog, type Book } from "./Catalog.tsx";
 import "./style.css";
-
-type Book = { id: number; title: string; authors: string | null; year: number | null; cover_file: string | null };
 
 function App() {
   const [view, setView] = useState<"catalogo" | "aggiungi">("catalogo");
@@ -28,14 +27,7 @@ function App() {
         <>
           {books === null && <p>Caricamento…</p>}
           {books?.length === 0 && <p>Nessun libro in catalogo.</p>}
-          <ul className="books">
-            {books?.map((b) => (
-              <li key={b.id}>
-                {b.cover_file ? <img src={`/copertine/${b.cover_file}`} alt="" /> : <div className="no-cover" />}
-                <span>{b.title}{b.authors ? ` — ${b.authors}` : ""}{b.year ? ` (${b.year})` : ""}</span>
-              </li>
-            ))}
-          </ul>
+          {!!books?.length && <Catalog books={books} onChanged={load} />}
         </>
       )}
     </main>

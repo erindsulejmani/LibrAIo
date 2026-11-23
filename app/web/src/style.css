@@ -1,6 +1,6 @@
 :root { font-family: system-ui, sans-serif; color: #222; background: #faf8f5; }
 main { max-width: 900px; margin: 0 auto; padding: 16px; }
-header { justify-content: space-between; flex-wrap: wrap; }
+header { justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
 h1 { margin: 0; }
 .row { display: flex; gap: 8px; align-items: center; }
 .stack { display: flex; flex-direction: column; gap: 12px; }
@@ -12,9 +12,20 @@ input, textarea { padding: 8px; font-size: 1rem; border: 1px solid #ccc; border-
 .scanner { width: 100%; max-height: 50vh; background: #000; border-radius: 8px; }
 .note { background: #eef3fa; padding: 8px; border-radius: 6px; }
 .error { background: #fbeaea; color: #8a1c1c; padding: 8px; border-radius: 6px; }
-.books { list-style: none; padding: 0; }
-.books li { display: flex; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid #eee; }
-.books img, .no-cover { width: 40px; height: 60px; object-fit: cover; background: #e6dfd6; flex-shrink: 0; }
+.wrap { flex-wrap: wrap; }
+.muted { color: #777; font-size: .9rem; margin: 0; }
+select { padding: 8px; font-size: 1rem; border-radius: 6px; border: 1px solid #ccc; }
+button.danger { background: #a33; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; }
+.card { display: flex; flex-direction: column; gap: 4px; background: none; color: inherit; padding: 0; text-align: left; font-size: .9rem; }
+.card img, .no-cover { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; background: #e6dfd6; }
+.no-cover { display: flex; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box; text-align: center; color: #5b3a1e; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e6dfd6; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: #f1ece5; }
+.cover-large { max-width: 200px; align-self: center; border-radius: 4px; }
 .covers { display: flex; gap: 16px; flex-wrap: wrap; border: 1px solid #ccc; border-radius: 6px; }
 .covers label { display: flex; align-items: center; gap: 6px; }
 .covers img { width: 80px; max-height: 120px; object-fit: contain; }

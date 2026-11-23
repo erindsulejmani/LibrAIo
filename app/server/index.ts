@@ -1,7 +1,7 @@
 import express from "express";
 import path from "node:path";
 import { networkInterfaces } from "node:os";
-import { writeFile } from "node:fs/promises";
+import { rm, writeFile } from "node:fs/promises";
 import { db, COVERS_DIR } from "./db.ts";
 import { normalizeIsbn } from "./isbn.ts";
 import { lookupIsbn, searchByTitle, type BookData } from "./lookup.ts";
@@ -101,6 +101,36 @@ app.post("/api/books", async (req, res) => {
   }
 
   res.status(201).json(db.prepare("SELECT * FROM books WHERE id = ?").get(id));
+});
+
+const EDITABLE = FIELDS.filter((f) => f !== "input_method");
+
+app.put("/api/books/:id", (req, res) => {
+  const body = req.body ?? {};
+  if (typeof body.title !== "string" || !body.title.trim()) {
+    res.status(400).json({ error: "Il titolo è obbligatorio." });
+    return;
+  }
+  const values = EDITABLE.map((f) => (body[f] === "" || body[f] === undefined ? null : body[f]));
+  const { changes } = db
+    .prepare(`UPDATE books SET ${EDITABLE.map((f) => `${f} = ?`).join(", ")}, updated_at = datetime('now') WHERE id = ?`)
+    .run(...values, Number(req.params.id));
+  if (!changes) {
+    res.status(404).json({ error: "Libro non trovato." });
+    return;
+  }
+  res.json(db.prepare("SELECT * FROM books WHERE id = ?").get(Number(req.params.id)));
+});
+
+app.delete("/api/books/:id", async (req, res) => {
+  const book = db.prepare("SELECT cover_file FROM books WHERE id = ?").get(Number(req.params.id)) as { cover_file: string | null } | undefined;
+  if (!book) {
+    res.status(404).json({ error: "Libro non trovato." });
+    return;
+  }
+  db.prepare("DELETE FROM books WHERE id = ?").run(Number(req.params.id));
+  if (book.cover_file) await rm(path.join(COVERS_DIR, book.cover_file), { force: true });
+  res.status(204).end();
 });
 
 app.use("/copertine", express.static(COVERS_DIR));

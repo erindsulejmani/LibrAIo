@@ -37,6 +37,6 @@ data/         database e copertine (creata all'avvio, non versionata)
 - [x] 1. Struttura, database, avvio Mac/Windows
 - [x] 2. Scansione ISBN + ricerca Google Books / Open Library
 - [x] 3. Foto copertina/frontespizio con Gemini + ritaglio copertina
-- [ ] 4. Dashboard: griglia/tabella, ricerca, ordinamento, modifica
+- [x] 4. Dashboard: griglia/tabella, ricerca, ordinamento, modifica
 - [ ] 5. Esportazione Excel e backup
 - [ ] 6. Ruoli amministratore / lettore

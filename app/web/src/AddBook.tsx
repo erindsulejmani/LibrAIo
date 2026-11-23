@@ -1,16 +1,7 @@
 import { useCallback, useState } from "react";
 import { IsbnScanner } from "./IsbnScanner.tsx";
 import { crop, loadPhoto, toBlob } from "./photo.ts";
-
-type Draft = {
-  isbn: string; title: string; authors: string; publisher: string; year: string;
-  language: string; genres: string; description: string; description_source: string; cover_url: string;
-};
-
-const LABELS: [keyof Draft, string][] = [
-  ["title", "Titolo"], ["authors", "Autori (separati da ;)"], ["publisher", "Editore"], ["year", "Anno"],
-  ["isbn", "ISBN"], ["language", "Lingua"], ["genres", "Generi (separati da ;)"],
-];
+import { BookFields, fromDraft, toDraft, type Draft } from "./BookFields.tsx";
 
 type Mode = "isbn" | "foto";
 type CoverChoice = "online" | "ritaglio" | "nessuna";
@@ -27,7 +18,7 @@ export function AddBook({ onSaved }: { onSaved: () => void }) {
 
   /** Mostra la scheda a partire dalla risposta del server (ricerca ISBN o analisi foto). */
   function showResult(json: any, method: string, croppedCover: string | null) {
-    setDraft(Object.fromEntries(Object.entries(json.data).map(([k, v]) => [k, v == null ? "" : String(v)])) as Draft);
+    setDraft(toDraft(json.data));
     setInputMethod(method);
     setCropped(croppedCover);
     setCover(croppedCover ? "ritaglio" : json.data.cover_url ? "online" : "nessuna");
@@ -74,8 +65,7 @@ export function AddBook({ onSaved }: { onSaved: () => void }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...draft,
-          year: draft.year ? Number(draft.year) : null,
+          ...fromDraft(draft),
           input_method: inputMethod,
           cover_url: cover === "online" ? draft.cover_url : null,
           cover_data: cover === "ritaglio" ? cropped : null,
@@ -92,8 +82,6 @@ export function AddBook({ onSaved }: { onSaved: () => void }) {
       setBusy(false);
     }
   }
-
-  const set = (k: keyof Draft) => (e: { target: { value: string } }) => setDraft((d) => d && { ...d, [k]: e.target.value });
 
   return (
     <section className="stack">
@@ -135,13 +123,7 @@ export function AddBook({ onSaved }: { onSaved: () => void }) {
             )}
             <label><input type="radio" checked={cover === "nessuna"} onChange={() => setCover("nessuna")} /> Nessuna</label>
           </fieldset>
-          {LABELS.map(([k, label]) => (
-            <label key={k} className="field">{label}<input value={draft[k]} onChange={set(k)} /></label>
-          ))}
-          <label className="field">
-            Riassunto{draft.description_source && ` (fonte: ${draft.description_source})`}
-            <textarea rows={6} value={draft.description} onChange={set("description")} />
-          </label>
+          <BookFields draft={draft} onChange={setDraft} />
           <div className="row">
             <button type="submit" disabled={busy || !draft.title.trim()}>Salva nel catalogo</button>
             <button type="button" className="secondary" onClick={() => { setDraft(null); setInfo(null); }}>Annulla</button>
