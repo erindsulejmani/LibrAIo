@@ -8,10 +8,12 @@
   },
   "scripts": {
     "build": "vite build",
-    "start": "node --disable-warning=ExperimentalWarning app/server/index.ts",
+    "start": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning app/server/index.ts",
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "@zxing/browser": "^0.2.1",
+    "@zxing/library": "^0.23.0",
     "express": "^5.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

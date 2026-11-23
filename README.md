@@ -13,6 +13,9 @@ salva in un database consultabile da una dashboard (ricerca, ordinamento, esport
 ## Requisiti
 - [Node.js](https://nodejs.org) versione LTS (22.18 o successiva).
 
+## Configurazione (facoltativa)
+Copia `.env.example` come `.env` e inserisci le chiavi (vedi commenti nel file).
+
 ## Avvio
 - **Mac:** doppio clic su `avvio-mac/Avvia LibrAIo.command`
   (la prima volta: clic destro → Apri, se macOS blocca il file).
@@ -32,7 +35,7 @@ data/         database e copertine (creata all'avvio, non versionata)
 
 ## Stato
 - [x] 1. Struttura, database, avvio Mac/Windows
-- [ ] 2. Scansione ISBN + ricerca Google Books / Open Library
+- [x] 2. Scansione ISBN + ricerca Google Books / Open Library
 - [ ] 3. Foto copertina/frontespizio con Gemini + ritaglio copertina
 - [ ] 4. Dashboard: griglia/tabella, ricerca, ordinamento, modifica
 - [ ] 5. Esportazione Excel e backup
